@@ -17,5 +17,5 @@ Provide a brief introduction to the project, its purpose, and any relevant backg
 
 Explain the architecture of your AWS EKS setup. Include diagrams and visual representations for better understanding.
 
-![Architecture Diagram](path/to/your/eks-architecture.png)
+![Architecture Diagram](image/eks-architecture.png)
 
