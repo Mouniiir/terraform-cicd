@@ -1,0 +1,73 @@
+stages:
+    - format
+    - apply
+
+image:
+  name: linuxbandit/terraform-with-tfsec
+  entrypoint:
+    - '/usr/bin/env'
+    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+
+before_script:
+    - export AWS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
+    - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+
+dev_fmt:
+    stage: format
+    script:
+        - cd dev
+        - terraform fmt 
+    only:
+        changes:
+            - dev/*
+
+dev_apply:
+    stage: apply
+    script:
+        - terraform init 
+        - terraform plan -var-file=./dev/dev.tfvars -out "devplan" 
+        - terraform apply -var-file=./dev/dev.tfvars -input=false "devplan"
+    when: manual
+    only:
+        changes:
+            - dev/*
+
+stg_fmt:
+    stage: format
+    script:
+        - terraform fmt 
+    only:
+        changes:
+            - stg/*
+
+stg_apply:
+    stage: apply
+    script:
+        - terraform init 
+        - terraform plan -var-file=./stg/stg.tfvars -out "stgplan" 
+        - terraform apply -var-file=./stg/stg.tfvars -input=false "stgplan" 
+    when: manual
+    only:
+        changes:
+            - stg/*
+
+prod_fmt:
+    stage: format
+    script:
+        - cd prod
+        - terraform fmt 
+    only:
+        changes:
+            - prod/*
+
+prod_apply:
+    stage: apply
+    script:
+        - cd prod
+        - terraform init 
+        - terraform plan -var-file=./prd/prd.tfvars -out "prodplan" 
+        - terraform apply -var-file=./prd/prd.tfvars -input=false "prodplan"
+    when: manual
+    only:
+        changes:
+            - prod/*
